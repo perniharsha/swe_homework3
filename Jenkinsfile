@@ -1,7 +1,6 @@
 pipeline {
     agent any
     tools {
-        jdk 'jdk-9.0.4-oth-JPR'
         maven 'maven'
     }
     environment {
