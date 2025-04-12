@@ -39,12 +39,8 @@ pipeline {
                 sh 'docker push perni007/backend:latest'
             }
         }
-        stage("Push HTML Image to Docker Hub") {
-            steps {
-                sh 'docker push perni007/backend:latest'
-            }
-        }
-        stage("deploying on k8") {
+        
+      stage("deploying on k8") {
             steps {
                 sh 'kubectl set image deployment/hw3swe container-0=skm05/springdemo:latest -n default'
                 sh 'kubectl rollout restart deploy backenddemo -n default'
