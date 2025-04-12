@@ -10,12 +10,12 @@ pipeline {
     stages {
         stage('Maven Clean') {
             steps {
-               script{
-                sh 'mvn clean install -DskipTests'
-               }
+                script {
+                    sh 'mvn clean install -DskipTests'
+                }
             }
         }
-        
+
         stage('Build') {
             steps {
                 sh 'rm -rf *.var'
@@ -33,7 +33,7 @@ pipeline {
                 sh 'docker push perni007/backend:latest'
             }
         }
-        stage("deploying on k8") {
+        stage("Deploying on K8") {
             steps {
                 sh 'kubectl set image deployment/hw3swe container-0=perni007/backend:latest -n default'
                 sh 'kubectl rollout restart deploy hw3swe -n default'
@@ -42,7 +42,10 @@ pipeline {
     }
     post {
         always {
-            sh 'docker logout'
+            // Ensure this is inside a node block:
+            node {
+                sh 'docker logout'
+            }
         }
     }
 }
