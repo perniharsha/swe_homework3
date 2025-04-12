@@ -1,70 +1,62 @@
 pipeline {
     agent any
-
     tools {
         jdk 'java'
         maven 'maven'
     }
-
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-
     stages {
-
         stage('Maven Clean') {
             steps {
-                script {
-                    sh 'mvn clean install -DskipTests'
-                }
+               script{
+                sh 'mvn clean install -DskipTests'
+               }
             }
         }
-
-        stage('Build JAR & Docker Image') {
+        
+        stage('Build') {
             steps {
-                script {
-                    sh 'rm -rf *.var'
-                    sh 'jar -cvf survey0.1-0.0.1-SNAPSHOT.jar -C "src/main" .'
-                    sh 'docker build -t perni007/backend:latest .'
-                }
+                sh 'rm -rf *.var'
+                sh 'jar -cvf survey0.1-0.0.1-SNAPSHOT.jar -C "src/main" .'     
+                sh 'docker build -t skm05/springdemo:latest .'
             }
         }
-
-        stage('Docker Login') {
+        stage('Build HTML Image') {
             steps {
-                script {
-                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                }
+                // Build the Docker image for the HTML application
+                sh 'docker build -t skm05/frontdemo:latest -f Dockerfile .'
             }
         }
-
-        stage('Push Image to Docker Hub') {
+        stage('Login') {
             steps {
-                script {
-                    sh 'docker push perni007/backend:latest'
-                }
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
-
-        stage('Deploy to Kubernetes') {
+        stage("Push image to docker hub") {
             steps {
-                script {
-                    sh 'kubectl set image deployment/hw3swe container-0=perni007/backend:latest -n default'
-                    sh 'kubectl rollout restart deploy backenddemo -n default'
-                }
+                sh 'docker push skm05/springdemo:latest'
+            }
+        }
+        stage("Push HTML Image to Docker Hub") {
+            steps {
+                sh 'docker push skm05/frontdemo:latest'
+            }
+        }
+        stage("deploying on k8") {
+            steps {
+                sh 'kubectl set image deployment/backenddemo container-0=skm05/springdemo:latest -n default'
+                sh 'kubectl rollout restart deploy backenddemo -n default'
+
+                sh "kubectl set image deployment/frontdemo container-0=skm05/frontdemo:latest -n default"
+                sh "kubectl rollout restart deploy frontdemo -n default"
             }
         }
     }
-
     post {
         always {
-            script {
-                try {
-                    sh 'docker logout'
-                } catch (err) {
-                    echo "Docker logout failed or Docker daemon not running: ${err}"
-                }
-            }
+            sh 'docker logout'
         }
     }
 }
