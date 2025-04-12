@@ -58,13 +58,11 @@ pipeline {
 
     post {
         always {
-            node {  // Fix: ensure Jenkins has a workspace to run shell commands
-                script {
-                    try {
-                        sh 'docker logout'
-                    } catch (err) {
-                        echo "Docker logout failed or Docker daemon not running: ${err}"
-                    }
+            script {
+                try {
+                    sh 'docker logout'
+                } catch (err) {
+                    echo "Docker logout failed or Docker daemon not running: ${err}"
                 }
             }
         }
