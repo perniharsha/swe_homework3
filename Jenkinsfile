@@ -7,14 +7,6 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
     stages {
-        stage('Maven Clean') {
-            steps {
-                script {
-                    sh 'mvn clean install -DskipTests'
-                }
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'rm -rf *.var'
