@@ -43,7 +43,7 @@ pipeline {
         }
         stage("deploying on k8") {
             steps {
-                sh 'kubectl set image deployment/backenddemo container-0=perni007/backend:latest -n default'
+                sh 'kubectl set image deployment/hw3swe container-0=perni007/backend:latest -n default'
                 sh 'kubectl rollout restart deploy backenddemo -n default'
             }
         }
