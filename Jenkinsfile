@@ -20,13 +20,7 @@ pipeline {
             steps {
                 sh 'rm -rf *.var'
                 sh 'jar -cvf survey0.1-0.0.1-SNAPSHOT.jar -C "src/main" .'     
-                sh 'docker build -t skm05/springdemo:latest .'
-            }
-        }
-        stage('Build HTML Image') {
-            steps {
-                // Build the Docker image for the HTML application
-                sh 'docker build -t skm05/frontdemo:latest -f Dockerfile .'
+                sh 'docker build -t perni007/backend:latest .'
             }
         }
         stage('Login') {
@@ -36,21 +30,13 @@ pipeline {
         }
         stage("Push image to docker hub") {
             steps {
-                sh 'docker push skm05/springdemo:latest'
-            }
-        }
-        stage("Push HTML Image to Docker Hub") {
-            steps {
-                sh 'docker push skm05/frontdemo:latest'
+                sh 'docker push perni007/backend:latest'
             }
         }
         stage("deploying on k8") {
             steps {
-                sh 'kubectl set image deployment/backenddemo container-0=skm05/springdemo:latest -n default'
-                sh 'kubectl rollout restart deploy backenddemo -n default'
-
-                sh "kubectl set image deployment/frontdemo container-0=skm05/frontdemo:latest -n default"
-                sh "kubectl rollout restart deploy frontdemo -n default"
+                sh 'kubectl set image deployment/hw3swe container-0=perni007/backend:latest -n default'
+                sh 'kubectl rollout restart deploy hw3swe -n default'
             }
         }
     }
