@@ -23,12 +23,6 @@ pipeline {
                 sh 'docker build -t perni007/backend:latest .'
             }
         }
-        stage('Build HTML Image') {
-            steps {
-                // Build the Docker image for the HTML application
-                sh 'docker build -t perni007/backend:latest -f Dockerfile .'
-            }
-        }
         stage('Login') {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
