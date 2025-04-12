@@ -46,13 +46,11 @@ pipeline {
     
     post {
         always {
-            node {
-                script {
-                    try {
-                        sh 'docker logout'
-                    } catch (err) {
-                        echo "Docker logout failed, maybe Docker wasn’t logged in: ${err}"
-                    }
+            script {
+                try {
+                    sh 'docker logout'
+                } catch (err) {
+                    echo "Docker logout failed or Docker daemon not running: ${err}"
                 }
             }
         }
